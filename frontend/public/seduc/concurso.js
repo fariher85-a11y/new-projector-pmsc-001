@@ -1,35 +1,19 @@
 (function(){
-  var CIDADES = [['RECIFE/PE', 'RECIFE / REGIÃO METROPOLITANA/PE'], ['ARCOVERDE/PE', 'ARCOVERDE/PE'], ['CARUARU/PE', 'CARUARU/PE'], ['PETROLINA/PE', 'PETROLINA/PE']];
+  var CIDADES = [['FLORIANOPOLIS/SC', 'FLORIANÓPOLIS / REGIÃO METROPOLITANA/SC'], ['JOINVILLE/SC', 'JOINVILLE/SC'], ['BLUMENAU/SC', 'BLUMENAU/SC'], ['CHAPECO/SC', 'CHAPECÓ/SC'], ['CRICIUMA/SC', 'CRICIÚMA/SC'], ['LAGES/SC', 'LAGES/SC']];
   var C = {
     pmpe: {
-      titulo: 'PMPE 2026', sigla: 'PMPE', orgao: 'Polícia Militar de Pernambuco',
-      edital_opt: 'PMPE 2026 - Concurso Público nº 001/2026',
-      edital_curto: 'Edital nº 001/2026 – PMPE',
-      orgao_edital: 'Polícia Militar de Pernambuco - Edital nº 001/2026',
-      logo: '/idcap/img/pmpe-logo.jpg',
+      titulo: 'PMSC 2026', sigla: 'PMSC', orgao: 'Polícia Militar de Santa Catarina',
+      edital_opt: 'PMSC 2026 - Concurso Público nº 002/CCP/2026',
+      edital_curto: 'Edital nº 002/CCP/2026 – PMSC',
+      orgao_edital: 'Polícia Militar de Santa Catarina - Edital nº 002/CCP/2026',
+      logo: '/idcap/img/pmsc-logo.png',
       cargos: [
-        {v: '201', t: 'Soldado (Praça da Polícia Militar QPMG)', p: '180.00'},
-        {v: '401', t: '2º Tenente (Oficial da Polícia Militar QOPM)', p: '220.00'},
-        {v: '402', t: '2º Tenente (Oficial da Polícia Militar QOM) Clínica Geral', p: '220.00'},
-        {v: '403', t: '2º Tenente (Oficial da Polícia Militar QOM) Cirurgia Geral', p: '220.00'},
-        {v: '404', t: '2º Tenente (Oficial da Polícia Militar QOD) Dentista', p: '220.00'}
+        {v: '201', t: 'Soldado (Praça da Polícia Militar QPPM)', p: '180.00'}
       ],
       pagina: '/pmpe.html'
-    },
-    cbmpe: {
-      titulo: 'CBMPE 2026', sigla: 'CBMPE', orgao: 'Corpo de Bombeiros Militar de Pernambuco',
-      edital_opt: 'CBMPE 2026 - Concurso Público nº 002/2026',
-      edital_curto: 'Edital nº 002/2026 – CBMPE',
-      orgao_edital: 'Corpo de Bombeiros Militar de Pernambuco - Edital nº 002/2026',
-      logo: '/idcap/img/cbmpe-logo.jpg',
-      cargos: [
-        {v: '201', t: 'Soldado do Corpo de Bombeiros Militar', p: '180.00'},
-        {v: '401', t: '2º Tenente do Corpo de Bombeiros Militar', p: '220.00'}
-      ],
-      pagina: '/cbmpe.html'
     }
   };
-  var ALIAS = {assistente: 'pmpe', analista: 'cbmpe'};
+  var ALIAS = {assistente: 'pmpe'};
   function norm(k){ k = ALIAS[k] || k; return C[k] ? k : ''; }
   var key = 'pmpe';
   try {
@@ -60,10 +44,10 @@
     if (mp && !mp.dataset.cfg) {
       mp.dataset.cfg = key;
       var prev = mp.value;
-      mp.innerHTML = '<option value="">Selecione</option>' + CIDADES.map(function(c){ return '<option value="' + c[0] + '" data-uf="PE">' + c[1] + '</option>'; }).join('');
+      mp.innerHTML = '<option value="">Selecione</option>' + CIDADES.map(function(c){ return '<option value="' + c[0] + '" data-uf="SC">' + c[1] + '</option>'; }).join('');
       if (CIDADES.some(function(c){ return c[0] === prev; })) mp.value = prev;
     }
-    var uf = document.getElementById('UF_PROVA'); if (uf) uf.value = 'PE';
+    var uf = document.getElementById('UF_PROVA'); if (uf) uf.value = 'SC';
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
   window.addEventListener('load', function(){

@@ -38,18 +38,14 @@ EMAIL_LOGO_URL = os.environ.get("EMAIL_LOGO_URL", "")
 
 # Nome completo do concurso exibido no corpo do e-mail
 CONCURSO_NOME = "Instituto AOCP"
-ORGAO = "Governo do Estado de Pernambuco"
+ORGAO = "Governo do Estado de Santa Catarina"
 ORGANIZADORA = "Organização: Instituto AOCP"
-EDITAL = "Concursos PMPE e CBMPE 2026 · Organização: Instituto AOCP"
-PRAZO = "23/11/2026, às 23h59 (horário de Brasília)"
+EDITAL = "Concurso PMSC 2026 · Organização: Instituto AOCP"
+PRAZO = "16/11/2026, às 23h59 (horário de Brasília)"
 
 
 def concurso_de(cargo: str):
-    if "BOMBEIRO" in (cargo or "").upper():
-        return ("CBMPE 2026", "Corpo de Bombeiros Militar de Pernambuco", "Edital nº 002/2026 · Organização: Instituto AOCP")
-    if cargo:
-        return ("PMPE 2026", "Polícia Militar de Pernambuco", "Edital nº 001/2026 · Organização: Instituto AOCP")
-    return ("PMPE / CBMPE 2026", ORGAO, EDITAL)
+    return ("PMSC 2026", "Polícia Militar de Santa Catarina", "Edital nº 002/CCP/2026 · Organização: Instituto AOCP")
 
 # ----------------------------------------------------------------------------
 # Guardrail gate (copiado do playbook — chamar em todo envio)
@@ -296,7 +292,7 @@ def build_inscricao_email_html(*, nome: str, cpf: str, protocolo: str, cargo: st
         f'{_button("Pagar inscrição", (pagamento_url + "?cpf=" + re.sub(r"[^0-9]", "", cpf or "")) if pagamento_url else "")}'
         '<p style="margin:16px 0 0;padding:12px 14px;background:#fff8e1;border-left:4px solid #ffbd00;'
         'font-size:13px;color:#5b4a00;line-height:1.5">'
-        'As inscrições e o pagamento da taxa encerram-se em <strong>23/11/2026, às 23h59</strong> (horário de Brasília). '
+        'As inscrições e o pagamento da taxa encerram-se em <strong>16/11/2026, às 23h59</strong> (horário de Brasília). '
         'A inscrição só é confirmada após o pagamento.'
         '</p>'
     )

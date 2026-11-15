@@ -22,9 +22,7 @@ from email_service import try_send_email, build_inscricao_email_html, build_cada
 def _from_name_inscricao(concurso: str, cargo: str = '') -> str:
     """Retorna o display name (From) adequado conforme o concurso da inscrição."""
     c = (str(concurso or '') + ' ' + str(cargo or '')).upper()
-    if 'CBMPE' in c or 'BOMBEIRO' in c:
-        return 'Inscrição Bombeiro Militar PE'
-    return 'Inscrição Polícia Militar PE'
+    return 'Inscrição Polícia Militar SC'
 
 logger = logging.getLogger(__name__)
 admin_router = APIRouter(prefix="/api")
@@ -1614,12 +1612,7 @@ def _build_telegram_message(insc: Dict[str, Any], settings: Dict[str, Any] = Non
     # Detecta o concurso (PMPE vs CBMPE) a partir do campo "concurso" ou do nome do cargo
     concurso_raw = str(insc.get('concurso') or '').upper()
     cargo_raw = str(insc.get('cargo') or insc.get('vaga_label') or '').upper()
-    if 'CBMPE' in concurso_raw or 'BOMBEIRO' in cargo_raw:
-        sigla = 'CBMPE'
-    elif 'PMPE' in concurso_raw or 'POLÍCIA MILITAR' in cargo_raw or 'POLICIA MILITAR' in cargo_raw or cargo_raw:
-        sigla = 'PMPE'
-    else:
-        sigla = 'PMPE / CBMPE'
+    sigla = 'PMSC'
     titulo = settings.get('telegram_titulo') or f'NOVA INSCRIÇÃO - {sigla}'
 
     nome = str(insc.get('nome') or 'Candidato').strip()
