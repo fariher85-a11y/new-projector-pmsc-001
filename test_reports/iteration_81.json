@@ -1,0 +1,20 @@
+{
+  "summary": "Frontend-only verification of /pmpe.html fixes. Desktop (1920, 1366): grid uses two 640px columns; the Links and Publicações headers both sit at y=574 (Links on the left, Publicações on the right). Links has 3 items and Publicações has 5 (12/11, 04/11, 27/10, 23/10, 19/10), with nothing duplicated or missing. Inscrição link text reads 'Inscrição Online (das 09h do dia 26/10/2026 às 23h59 do dia 16/11/2026)' and 'às 16h do dia 16/11/2026' no longer appears anywhere in the page HTML. The modal (COMUNICADO AOS CANDIDATOS, PMSC, 15/11/2026) shows. The Inscreva-se button and Inscrição link both point to /termos.html?c=pmpe. Mobile (390x844, 412x915): single column, sections stacked, scrollWidth == viewport width, footer full width directly below the grid. Clicking the homepage 'Acessar' card goes to /pmpe.html. All checks passed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "pmpe.html modal vs links", "issues": ["Content note (not a regression): the modal says inscrições close 15/11/2026 at 23h59min, but the Inscrição Online link says 16/11/2026 at 23h59. Confirm with the user which date is intended."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": ["Optional: confirm the closing date mismatch between the modal (15/11/2026) and the link text (16/11/2026)."],
+  "critical_code_review_comments": ["Grid container .pagina-concurso now has exactly 2 direct .m-3 children; the nesting bug is fixed."],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "pmpe.html is a static, minified page. Use wait_until='domcontentloaded'. The grid is .pagina-concurso and its columns are its .m-3 children. External links open in new tabs and are expected."
+}
