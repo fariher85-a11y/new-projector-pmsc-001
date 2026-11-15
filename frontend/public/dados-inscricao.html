@@ -779,7 +779,7 @@ h2.tituloPagina span { border-bottom:0 !important; text-indent:0 !important; pad
  <b>23/11/2026</b>
 </p>
 </div>
-<div class="blocoPadrao"><div class="dados"><div class="aocp-edital-card" data-testid="edital-card"><div class="aec-head"><h3 class="vn-keep" data-c="titulo">PMSC 2026</h3><p class="vn-sub" data-c="orgao">Polícia Militar de Santa Catarina</p></div></div>
+<div class="blocoPadrao"><div class="dados"><div class="aocp-edital-card" data-testid="edital-card"><div class="aec-head aec-head-logo" style="display:flex;align-items:center;gap:12px"><img class="aec-brasao" data-c-src="logo" src="/idcap/img/pmsc-logo.png" alt="Brasão do concurso" loading="lazy" style="width:48px;height:48px;flex:0 0 48px;object-fit:contain" /><div class="aec-head-text"><h3 class="vn-keep" data-c="titulo">PMSC 2026</h3><p class="vn-sub" data-c="orgao">Polícia Militar de Santa Catarina</p></div></div></div>
 <h2 class="tituloPagina"><span>Dados da Inscrição</span></h2>
 <form action="" enctype="multipart/form-data" id="frm-style-list" method="post">
 <label class="description">Preencha os campos abaixo. Todos os campos marcados com * são obrigatórios.</label>
@@ -800,7 +800,7 @@ h2.tituloPagina span { border-bottom:0 !important; text-indent:0 !important; pad
 </fieldset>
 <fieldset id="fs-prova-local">
 <label class="description">Cidade de Aplicação da Prova</label>
-<input type="hidden" id="UF_PROVA" name="UF_PROVA" value="PE">
+<input type="hidden" id="UF_PROVA" name="UF_PROVA" value="SC">
 <div class="fgv-field">
 <label><span class="error">*</span> Cidade</label>
 <select class="select" data-testid="select-municipio-prova" id="MUNICIPIO_PROVA" name="MUNICIPIO_PROVA" required="">
@@ -811,7 +811,7 @@ h2.tituloPagina span { border-bottom:0 !important; text-indent:0 !important; pad
 (function(){
  document.addEventListener('DOMContentLoaded', function(){
    var uf = document.getElementById('UF_PROVA'), mp = document.getElementById('MUNICIPIO_PROVA');
-   function syncUf(){ if(uf) uf.value = 'AP'; }
+   function syncUf(){ if(uf) uf.value = 'SC'; }
    if(mp){ mp.addEventListener('change', syncUf); syncUf(); setTimeout(syncUf, 300); setTimeout(syncUf, 1200); }
  });
 })();

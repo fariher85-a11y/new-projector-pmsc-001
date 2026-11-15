@@ -1,0 +1,41 @@
+{
+  "summary": "Tested the PMSC 2026 rebrand on backend and frontend. Backend: new pytest file tests/test_pmsc_rebrand.py, 13 of 13 passed. It covers concurso_de and PRAZO; the cadastro, inscrição (with and without lembrete) and pix email builders (PMSC header present, no Pernambuco/PMPE/CBMPE, deadline 16/11/2026 às 23h59, passes _assert_safe_email); _from_name_inscricao returns 'Inscrição Polícia Militar SC'; the Telegram sigla is PMSC; the pmpe.html modal shows 16/11/2026; the pmsc-logo.png asset loads. Frontend: ran the whole flow in the browser: pmpe.html -> Inscreva-se -> termos.html?c=pmpe -> inscricao.html -> dados-inscricao.html -> confirmacao.html -> inscricao-realizada.html -> minhas-inscricoes.html, then opened pagamento-pix.html?cpf=. Every page shows PMSC 2026 and Polícia Militar de Santa Catarina with no Pernambuco/PMPE/CBMPE visible. The cargo dropdown shows only '201 - Soldado (Praça da Polícia Militar QPPM) - R$ 180,00'. The 6 prova cities are the SC ones. The backend saved the cadastro, registration and inscricao (edital PMPE_26, R$ 180,00), and minhas-inscricoes shows PMSC 2026. The PIX page renders with QR code and copia-e-cola. Found 2 functional bugs: UF_PROVA is forced to 'AP' (Amapá), and the homepage card still says 15/11/2026.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "tests/test_telegram_title_pmpe_cbmpe.py", "issue": "Old regression test still expects the PMPE/CBMPE Telegram titles, so it now fails 9 times. This is expected after the rebrand: delete the file or update it to PMSC."},
+      {"endpoint": "email_service.ORGAO", "issue": "Unused constant 'Governo do Estado de Santa Catarina'. Harmless."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "dados-inscricao.html UF_PROVA", "issue": "Line 814 has syncUf(){ uf.value='AP' }, which runs on DOMContentLoaded, on city change and after 300 ms and 1200 ms. It overrides the 'SC' that concurso.js sets. The hidden input also defaults to value='PE' (line 803). Result: the confirmação page shows 'ESTADO DA PROVA: Amapá', and form_data.UF_PROVA='AP' was saved in the cadastros collection (checked in the DB).", "selector": "#UF_PROVA", "priority": "HIGH"},
+      {"component": "inicio.html (homepage card)", "issue": "The concurso card still says 'Inscrições abertas até 15/11/2026 às 23h59'. It should be 16/11/2026, like the modal and the emails.", "selector": "inicio.html card text", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "inscricao.html, dados-inscricao.html, confirmacao.html", "issues": ["The edital-card header is text only, with no PMSC brasão img (no data-c-src='logo'). pagamento-pix, inscricao-realizada, termos and minhas-inscricoes do show /idcap/img/pmsc-logo.png. The request said the logo should be on every page."]},
+      {"screen": "termos.html", "issues": ["The header repeats 'Polícia Militar de Santa Catarina': the title is 'PMSC - Polícia Militar de Santa Catarina' and the subtitle is 'Polícia Militar de Santa Catarina'. The checkbox and buttons have no data-testid (#termos, #bt-continuar)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_pmsc_rebrand.py", "/app/test_reports/pytest/pmsc_rebrand.xml"],
+  "action_items": [
+    "dados-inscricao.html line 814: change uf.value='AP' to 'SC' (or remove syncUf), and change the hidden default value='PE' on line 803 to 'SC'",
+    "inicio.html: change 'Inscrições abertas até 15/11/2026' to 16/11/2026",
+    "Optional: add the brasão img (data-c-src='logo') to the edital-card on inscricao, dados-inscricao and confirmacao",
+    "Optional: remove the dead cbmpe branches: termos.html D.cbmpe (has 'Corpo de Bombeiros Militar de Pernambuco' in JS), minhas-inscricoes isCbm/'CBMPE 2026', and pagamento-pix/confirmacao CBMPE_26 ternaries",
+    "Delete or update the obsolete tests/test_telegram_title_pmpe_cbmpe.py"
+  ],
+  "critical_code_review_comments": [
+    "The UF_PROVA override is leftover code from an older SEAD/AP clone. It saves the wrong state into the DB.",
+    "/cbmpe.html file is deleted, but the server's SPA fallback answers 200 with the React index (title 'IDCAP | SEAD/AP 2026', another stale title), which then sends the user to /inicio.html. So the page cannot be reached, but the status is not a real 404.",
+    "minhas-inscricoes still matches /Bombeiro/i to choose the CBMPE label and logo (cbmpe-logo.jpg). Legacy records could show 'CBMPE 2026'."
+  ],
+  "updated_files": ["/app/backend/tests/test_pmsc_rebrand.py"],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "~85% (flow fully works; UF_PROVA wrong and homepage date stale)"},
+  "seed_data_creation": "Created test inscrição CPF 07630254296 / 'TEST PMSC CANDIDATO' through the UI, then deleted it from registrations (4 docs), inscricoes (1) and cadastros (1) using an exact cpf + nome filter. Side effect: the flow sent 1 real Telegram notification (telegram_message_id 36168).",
+  "test_credentials": "/app/memory/test_credentials.md present (admin donas). The admin painel was not needed for this test.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Flow order: pmpe.html (close the modal with #avisoOk first, or the Inscreva-se click is blocked) -> termos (#termos checkbox, #bt-continuar) -> inscricao.html (NOME, CPF, DATA_NASCIMENTO, SEXO, CEP, NUMERO, CELULAR, EMAIL, DOC_TIPO=RG plus #DOC_FRENTE/#DOC_VERSO files, #declaracao_veracidade) -> dados-inscricao (#VAGA=201, #MUNICIPIO_PROVA, termo checkbox, btn-cadastrar) -> confirmacao (btn-confirmar-inscricao, then conf-success-ok) -> inscricao-realizada. Generate a random valid CPF. Use wait_until='domcontentloaded'. After the fix, check c-uf-prova shows 'Santa Catarina'."
+}
