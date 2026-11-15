@@ -1,0 +1,20 @@
+{
+  "summary": "Frontend-only test of the PMSC page (/pmpe.html) and the homepage. Tested at 1920x1080, 390x844 and 412x915. Everything passed except one issue: the document <title> still read 'PMPE - Polícia Militar de Pernambuco | Instituto AOCP'. I fixed it to 'PMSC - Polícia Militar de Santa Catarina | Instituto AOCP' and confirmed the live page serves the new title. Results: the modal 'COMUNICADO AOS CANDIDATOS' mentions PMSC and 15/11/2026. Both #avisoOk and #avisoClose dismiss it, and it does not come back on reload in the same session. The logo loads (naturalWidth=366). Title and CFP description are correct, and the body text has no Pernambuco or PMPE. Inscreva-se and Inscrição Online both go to /termos.html?c=pmpe. The page shows exactly 3 links and 5 publicações with the expected dates. Home / -> Acessar -> /pmpe.html works. On mobile there is no horizontal scroll (scrollWidth == viewport width) and the modal fits inside the viewport with 16px margins.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "pmpe.html <title>", "issue": "Browser tab title still said 'PMPE - Polícia Militar de Pernambuco'. Fixed by the testing agent.", "selector": "head > title", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": ["The homepage at / is served directly at '/' (the URL stays '/'); it is not a redirect to /inicio.html. Content and navigation are correct either way."],
+  "updated_files": ["/app/frontend/public/pmpe.html (only the <title> text changed)"],
+  "success_rate": {"backend": "N/A", "frontend": "100% after the title fix (before the fix: 1 failure in the 'no Pernambuco anywhere' check)"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Static page. Use wait_until='domcontentloaded'. For link clicks, wrap in page.expect_navigation, because wait_for_load_state returns before navigation starts. The modal uses sessionStorage key 'aviso_prazo_pmpe'; clear it to see the modal again."
+}
