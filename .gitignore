@@ -80,6 +80,15 @@ memory/test_credentials.md
 
 # Mobile development
 android-sdk/
+.env
+.env.*
+*.env
+credentials.json
+*.key
+.credentials
 
-# overlay black-box crash/user-report dumps — session data, never history
-**/.emergent/recordings/
+# Backups
+*.bak
+*.bak2
+*.bak3
+*.pre_cebraspe.bak
