@@ -1,0 +1,21 @@
+{
+  "summary": "Frontend-only test of static homepage (/inicio.html via /). Ran in Chromium at 1920x1080, 1366x768, 1280x800, 412x915, 390x844 (WebKit engine not available in the tool, so iPhone width was checked in Chromium). All requested checks passed: heading text is 'Concurso da Polícia Militar de Santa Catarina' (shown in uppercase by CSS). The single card [data-testid=concurso-pmsc] is exactly centered: left and right gaps are 712/712 at 1920, 435/435 at 1366 and 392/392 at 1280, with the card 496px wide. On mobile the gaps are 16/16 (card 380px wide at 412, 358px wide at 390). scrollWidth equals the viewport width at every size, so there is no horizontal scroll. The PMSC brasão (/idcap/img/pmsc-logo.png) loads (naturalWidth>0). The title, the edital text and [data-testid=inscricao-data-pmsc] 'Inscrições abertas até 15/11/2026 às 23h59' are all present. Only 1 .ic-card exists, and #lista-concursos has no PMPE/CBMPE/Pernambuco text.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Homepage mobile (390/412)", "issues": ["The edital line 'POLÍCIA MILITAR DE SANTA CATARINA - PMSC - Edital 002/CCP/2026 - CFP' is cut off with an ellipsis on one line, so the edital number and '- CFP' are hidden. Consider letting it wrap on mobile.", "A faint vertical shadow/gradient strip is visible at the far right edge of the mobile viewport (probably the off-canvas menu's shadow). It is cosmetic only and causes no overflow."]},
+      {"screen": "Homepage (all)", "issues": ["The page never reaches 'networkidle' (Playwright goto with networkidle timed out after 30s), so some script keeps polling or making requests. Not visible to users, but worth checking."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": ["Optional: allow the edital description to wrap on mobile instead of cutting it off with an ellipsis", "Optional: check what keeps network activity going on inicio.html"],
+  "critical_code_review_comments": ["The leftover ['pmpe','cbmpe'] href-rewrite script in inicio.html is harmless and still rewrites the /pmpe.html link of the PMSC card (as intended for now)."],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Static page; use wait_until='domcontentloaded' (networkidle never fires). Card centering was measured with getBoundingClientRect on [data-testid=concurso-pmsc]. The Acessar link to /pmpe.html is intentional."
+}
