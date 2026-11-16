@@ -1,0 +1,29 @@
+{
+  "summary": "Retest of PMSC 2026 rebrand after iteration_82 fixes (UF_PROVA->SC, homepage date 16/11, edital-card brasao on 3 pages). All 3 fixes verified. Ran the full public inscricao flow in the browser: pmpe.html (closed #avisoOk modal) -> Inscreva-se -> termos.html?c=pmpe (#termos, #bt-continuar) -> inscricao.html (filled NOME/CPF random-valid/DATA_NASCIMENTO/SEXO/CEP autofill/NUMERO/CELULAR/EMAIL/DOC_TIPO=RG/#DOC_FRENTE/#DOC_VERSO/#declaracao_veracidade, submit btn-continuar-inscricao) -> dados-inscricao.html (#VAGA=201, #MUNICIPIO_PROVA=FLORIANOPOLIS, term checkbox, btn-cadastrar) -> confirmacao.html (btn-confirmar-inscricao, conf-success-ok) -> inscricao-realizada.html. Flow completed with no errors. Backend pytest tests/test_pmsc_rebrand.py = 13/13 green; obsolete tests/test_telegram_title_pmpe_cbmpe.py confirmed deleted.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_fixes": [
+    "CRITICAL REGRESSION FIXED: after picking the SC prova city, confirmacao.html 'ESTADO DA PROVA' reads 'Santa Catarina' (CIDADE: FLORIANOPOLIS/SC). The hidden #UF_PROVA value read 'SC' after city select. Backend persistence verified in Mongo cadastros: form_data.UF_PROVA='SC', MUNICIPIO_PROVA='FLORIANOPOLIS/SC' (no longer 'AP'/Amapa).",
+    "Homepage inicio.html card now reads 'Inscricoes abertas ate 16/11/2026 as 23h59' (15/11/2026 no longer present).",
+    "edital-card brasao img.aec-brasao (data-c-src='logo', /idcap/img/pmsc-logo.png) now renders on inscricao.html, dados-inscricao.html and confirmacao.html with naturalWidth=366 (>0) next to 'PMSC 2026' / 'Policia Militar de Santa Catarina'.",
+    "No page in the flow shows visible 'Pernambuco'/'PMPE'/'CBMPE'; headers read 'PMSC 2026' / 'Policia Militar de Santa Catarina'.",
+    "Backend pytest tests/test_pmsc_rebrand.py 13/13 PASSED; tests/test_telegram_title_pmpe_cbmpe.py removed from suite."
+  ],
+  "test_report_links": ["/app/backend/tests/test_pmsc_rebrand.py", "/app/test_reports/pytest/pmsc_rebrand_it83.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "test_pmsc_rebrand.py reads REACT_APP_BACKEND_URL at import time and crashes collection if the env var is unset; pytest must be run with REACT_APP_BACKEND_URL exported (I sourced it from frontend/.env). Minor: guard with a default-skip.",
+    "The blank/fresh confirmacao.html (empty sessionStorage) still fires btn-confirmar and shows inscricao-realizada with number 2026000000 and empty Nome/CPF/Cargo; it did NOT persist an inscricoes record, so harmless, but confirmacao could guard against submitting with no form_data."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% (full flow + all 3 fixes verified)"},
+  "test_credentials": "/app/memory/test_credentials.md present (admin donas). Not needed for public flow.",
+  "seed_data_creation": "Created test inscricao CPF 03854992211 / 'TEST PMSC CANDIDATO' via the UI, then deleted it by exact cpf+nome filter from cadastros (1) and registrations (2); no inscricoes record existed. Verified 0 remaining with that cpf. Known side effect: btn-cadastrar may have sent 1 real Telegram notification (expected per briefing).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All 3 iteration_82 bugs are fixed and verified end-to-end. UF_PROVA now persists as 'SC'. Flow order and selectors: pmpe.html #avisoOk -> text=Inscreva-se -> termos (#termos,#bt-continuar) -> inscricao.html (NOME uses input[name=NOME] no id; #CPF,#DATA_NASCIMENTO as DD/MM/AAAA,select[name=SEXO],#CEP autofill,#NUMERO,#CELULAR,#EMAIL,#DOC_TIPO,#DOC_FRENTE,#DOC_VERSO,#declaracao_veracidade, submit [data-testid=btn-continuar-inscricao]) -> dados-inscricao (#VAGA=201,#MUNICIPIO_PROVA SC cities,[data-testid=btn-cadastrar]) -> confirmacao ([data-testid=btn-confirmar-inscricao],[data-testid=conf-success-ok]) -> inscricao-realizada. Run pytest with REACT_APP_BACKEND_URL exported from frontend/.env."
+}

@@ -34,10 +34,10 @@ JWT_EXP_HOURS = 8
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'donas')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Seinao10@@')
 
-# Taxas de inscrição PMPE/CBMPE 2026: Soldado R$ 180, Oficial (2º Tenente) R$ 220
-VALOR_INSCRICAO = 180.0
-TAXA_INSCRICAO_STR = 'R$ 180,00'
-VALOR_OFICIAL = 220.0
+# Taxa de inscrição PMSC 2026 (Edital nº 002/CCP/2026): Soldado (QPPM) R$ 200,00
+VALOR_INSCRICAO = 200.0
+TAXA_INSCRICAO_STR = 'R$ 200,00'
+VALOR_OFICIAL = 200.0
 
 
 def valor_por_cargo(titulo):

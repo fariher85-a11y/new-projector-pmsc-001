@@ -1,5 +1,5 @@
 (function(){
-  var CIDADES = [['FLORIANOPOLIS/SC', 'FLORIANÓPOLIS / REGIÃO METROPOLITANA/SC'], ['JOINVILLE/SC', 'JOINVILLE/SC'], ['BLUMENAU/SC', 'BLUMENAU/SC'], ['CHAPECO/SC', 'CHAPECÓ/SC'], ['CRICIUMA/SC', 'CRICIÚMA/SC'], ['LAGES/SC', 'LAGES/SC']];
+  var CIDADES = [['BALNEARIO CAMBORIU/SC', 'BALNEÁRIO CAMBORIÚ/SC'], ['BLUMENAU/SC', 'BLUMENAU/SC'], ['CANOINHAS/SC', 'CANOINHAS/SC'], ['CHAPECO/SC', 'CHAPECÓ/SC'], ['CRICIUMA/SC', 'CRICIÚMA/SC'], ['FLORIANOPOLIS/SC', 'FLORIANÓPOLIS/SC'], ['JOACABA/SC', 'JOAÇABA/SC'], ['JOINVILLE/SC', 'JOINVILLE/SC'], ['LAGES/SC', 'LAGES/SC'], ['RIO DO SUL/SC', 'RIO DO SUL/SC'], ['SAO MIGUEL DO OESTE/SC', 'SÃO MIGUEL DO OESTE/SC'], ['TUBARAO/SC', 'TUBARÃO/SC']];
   var C = {
     pmpe: {
       titulo: 'PMSC 2026', sigla: 'PMSC', orgao: 'Polícia Militar de Santa Catarina',
@@ -8,7 +8,7 @@
       orgao_edital: 'Polícia Militar de Santa Catarina - Edital nº 002/CCP/2026',
       logo: '/idcap/img/pmsc-logo.png',
       cargos: [
-        {v: '201', t: 'Soldado (Praça da Polícia Militar QPPM)', p: '180.00'}
+        {v: '201', t: 'Soldado do Quadro de Praças Policial Militar (QPPM)', p: '200.00'}
       ],
       pagina: '/pmpe.html'
     }
