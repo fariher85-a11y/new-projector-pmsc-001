@@ -1,0 +1,36 @@
+{
+  "summary": "Tested PMSC 2026 (A) 'Imprimir comprovante' on /pagamento-pix.html and (B) pmpe.html->pmsc.html rename. Ran full public inscricao flow in browser (pmsc.html modal -> Inscreva-se -> termos?c=pmpe -> inscricao -> dados-inscricao VAGA=201 + SC city -> confirmacao -> inscricao-realizada -> PAGAR INSCRICAO -> pagamento-pix). QR rendered. The new 'IMPRIMIR COMPROVANTE' button [data-testid=btn-imprimir-comprovante] appears to the RIGHT of 'VOLTAR' (x=659 > x=502). Clicking it opens a NEW TAB with a well-designed comprovante showing: title 'COMPROVANTE DE INSCRICAO', 'PMSC 2026', 'Policia Militar de Santa Catarina', protocolo (2026194400), nome, formatted CPF (932.561.944-00), cargo 'Soldado do Quadro de Pracas Policial Militar (QPPM)', 'R$ 200,00', a Data da inscricao value, pmsc logo img (naturalWidth=366), Pix QR img (naturalWidth=392), and 'Imprimir'+'Fechar' buttons. NO copia-e-cola code present. Backend recorded PIX baixado (inscricoes.pix_status='PIX baixado'; compute_status surfaces it for admin list + KPI; pix_downloaded doc upserted). Rename verified: homepage 'Acessar' -> /pmsc.html (200) loads PMSC page+modal; Inscreva-se -> termos.html?c=pmpe; pmpe.html file removed, no pmpe.html links in public/. pytest test_pmsc_rebrand.py 13/13 PASS (after I updated the obsolete test_pmpe_modal_date to fetch /pmsc.html).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Comprovante 'Data da inscricao'", "issue": "pagamento-pix.html line ~1058 fetches '/api/inscricao-resumo?cpf=<cpf>&cargo=<codigo>' (hyphenated, query-param) which does NOT exist and returns HTTP 404. The real backend route is '/api/inscricao/resumo/{cpf}?cargo=...' (path param). Because the fetch 404s, the comprovante falls back to hojeBR() (the client's TODAY date) for 'Data da inscricao'. It only coincidentally displayed 16/11/2026 during this test because the server/browser clock is 16/11/2026; the ACTUAL inscription date returned by the backend is 15/11/2026. On any day != the inscription date the comprovante shows the wrong 'Data da inscricao'. Fix: change the frontend fetch URL to '/api/inscricao/resumo/' + encodeURIComponent(cpfDigits) + (vagaInfo.codigo ? '?cargo=' + encodeURIComponent(vagaInfo.codigo) : '').", "affected_selectors": ["btn-imprimir-comprovante"], "priority": "HIGH"}
+    ],
+    "design_issues": []
+  },
+  "verified_fixes": [
+    "A: btn-imprimir-comprovante present to the RIGHT of btn-voltar-pagamento on /pagamento-pix.html.",
+    "A: Clicking opens new tab with full comprovante (title, PMSC 2026, orgao, protocolo, nome, formatted CPF, cargo, R$ 200,00, data, logo nw=366, QR nw=392, Imprimir+Fechar). No copia-e-cola text.",
+    "A: Backend POST /api/track/pix-downloaded sets inscricoes.pix_status='PIX baixado'; compute_status returns it so admin Inscricoes list + 'PIX BAIXADOS' KPI reflect it. pix_downloaded collection upserted.",
+    "A: GET /api/inscricao/resumo/{cpf}?cargo=201 returns data_inscricao (e.g. '15/11/2026') alongside nome/cpf/cargo_titulo/valor/taxa/protocolo/concurso/edital.",
+    "B: Homepage 'Acessar' navigates to /pmsc.html (200) and loads PMSC concurso page with modal + PMSC content; Inscreva-se -> termos.html?c=pmpe; pmpe.html file removed; no /pmpe.html links remain in frontend/public.",
+    "pytest tests/test_pmsc_rebrand.py 13/13 PASSED."
+  ],
+  "test_report_links": ["/app/backend/tests/test_pmsc_rebrand.py", "/app/test_reports/pytest/pmsc_rebrand_it84.xml"],
+  "action_items": [
+    "FIX (HIGH): In frontend/public/pagamento-pix.html (~line 1058) correct the comprovante's inscricao-resumo fetch URL from '/api/inscricao-resumo?cpf=...&cargo=...' (404) to the real route '/api/inscricao/resumo/{cpf}?cargo=...' so 'Data da inscricao' comes from the backend instead of the today-date fallback."
+  ],
+  "critical_code_review_comments": [
+    "pagamento-pix.html comprovante uses hojeBR() fallback when the resumo fetch fails; since the fetch URL is wrong it ALWAYS falls back - the data_inscricao backend integration is effectively dead (masked today only because clock=16/11/2026).",
+    "test_pmsc_rebrand.py reads REACT_APP_BACKEND_URL at import time and crashes collection if unset; run with the env var exported (sourced from frontend/.env).",
+    "inscricao/resumo edital field returns internal code 'PMPE_26' - intentional per briefing."
+  ],
+  "updated_files": ["/app/backend/tests/test_pmsc_rebrand.py"],
+  "success_rate": {"backend": "100% (13/13 pytest + endpoints verified)", "frontend": "90% (comprovante works but Data da inscricao uses wrong endpoint/fallback)"},
+  "test_credentials": "/app/memory/test_credentials.md (admin donas/Seinao10@@). Admin not needed; verified status in Mongo directly.",
+  "seed_data_creation": "Created 2 test inscricoes via UI (CPFs 96875396823 and 93256194400, nome 'TEST PMSC COMPROVANTE'). Cleaned up by exact cpf+nome filter from inscricoes/registrations/cadastros/pix_generated/pix_copied/pix_downloaded (verified 0 remaining). A real Telegram notification may have fired on track calls (expected).",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Comprovante feature works end-to-end EXCEPT 'Data da inscricao' which 404s on the frontend fetch URL and falls back to today's date. Backend route is /api/inscricao/resumo/{cpf}?cargo=201 (NOT /api/inscricao-resumo?cpf=). After main agent fixes the frontend URL, retest: comprovante 'Data da inscricao' should equal backend data_inscricao (created_at-3h, dd/mm/YYYY) regardless of today's date. Full flow selectors documented in iteration_83. pytest test updated: test_pmsc_modal_date now fetches /pmsc.html.",
+  "rca of the issue": "Frontend/backend route mismatch. pagamento-pix.html calls window.location.origin + '/api/inscricao-resumo?cpf=' + cpf + '&cargo=' + codigo. FastAPI only registers '@admin_router.get(/inscricao/resumo/{cpf})' (prefix /api). The hyphen/query-param variant is unregistered => 404 => r.ok false => render('') => comprovante uses hojeBR() (today). Reproduced: curl /api/inscricao-resumo?cpf=...->{'detail':'Not Found'}; curl /api/inscricao/resumo/<cpf>?cargo=201->200 with data_inscricao=15/11/2026 while comprovante displayed 16/11/2026 (today)."
+}

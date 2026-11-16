@@ -73,8 +73,9 @@ def test_cbmpe_removed():
     assert r.status_code == 404 or "CBMPE" not in r.text
 
 
-def test_pmpe_modal_date():
-    r = requests.get(f"{BASE_URL}/pmpe.html", timeout=20)
+def test_pmsc_modal_date():
+    # Concurso page renamed pmpe.html -> pmsc.html
+    r = requests.get(f"{BASE_URL}/pmsc.html", timeout=20)
     assert r.status_code == 200
     assert "16/11/2026" in r.text
     assert "15/11/2026" not in r.text

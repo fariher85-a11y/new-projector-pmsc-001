@@ -1055,7 +1055,7 @@ html body:not(#vn_a):not(#vn_b) .aocp-edital-card .aec-head.aec-head-logo .aec-h
         qr: qrSrc
       });
     }
-    fetch(window.location.origin + '/api/inscricao-resumo?cpf=' + encodeURIComponent(cpfDigits) + (vagaInfo.codigo ? '&cargo=' + encodeURIComponent(vagaInfo.codigo) : ''))
+    fetch(window.location.origin + '/api/inscricao/resumo/' + encodeURIComponent(cpfDigits) + (vagaInfo.codigo ? '?cargo=' + encodeURIComponent(vagaInfo.codigo) : ''))
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(j){ render(j && j.data_inscricao ? j.data_inscricao : ''); })
       .catch(function(){ render(''); });
