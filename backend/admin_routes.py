@@ -1484,6 +1484,13 @@ async def inscricao_resumo(cpf: str, cargo: str = '', edital: str = ''):
     doc = await _db.inscricoes.find_one(f, sort=[('created_at', -1)])
     if not doc:
         raise HTTPException(status_code=404, detail='Inscrição não encontrada')
+    _ca = doc.get('created_at')
+    try:
+        if isinstance(_ca, str):
+            _ca = datetime.fromisoformat(_ca.replace('Z', '+00:00'))
+        data_insc = (_ca - timedelta(hours=3)).strftime('%d/%m/%Y') if _ca else ''
+    except Exception:
+        data_insc = ''
     return {
         'nome': doc.get('nome', ''),
         'cpf': digits,
@@ -1494,6 +1501,7 @@ async def inscricao_resumo(cpf: str, cargo: str = '', edital: str = ''):
         'protocolo': doc.get('protocolo', ''),
         'concurso': doc.get('concurso', ''),
         'edital': doc.get('edital', ''),
+        'data_inscricao': data_insc,
     }
 
 

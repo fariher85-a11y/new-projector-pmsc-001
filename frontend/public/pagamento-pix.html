@@ -851,8 +851,9 @@ html body:not(#vn_a):not(#vn_b) .aocp-edital-card .aec-head.aec-head-logo .aec-h
 <p style="margin-top:20px;padding:12px 16px;background:#fff3cd;border:1px solid #ffeaa7;color:#856404;border-radius:6px;font-size:13px;">
 <strong>Atenção:</strong> O pagamento pode levar até 24 horas para ser efetivado. E o seu status será atualizado automaticamente.
     </p>
-<div style="margin-top:20px;">
+<div style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
 <button data-testid="btn-voltar-pagamento" id="p-btn-voltar" style="padding:10px 22px;background:#e0e0e0;color:#0a2540;border:1px solid #999;font-weight:bold;font-size:13px;cursor:pointer;border-radius:999px;letter-spacing:0.3px;text-transform:uppercase;" type="button">← Voltar</button>
+<button data-testid="btn-imprimir-comprovante" id="p-btn-comprovante" onmouseout="this.style.background='#1172db';" onmouseover="this.style.background='#0b4f9c';" style="padding:10px 22px;background:#1172db;color:#ffffff;border:1px solid #1172db;font-weight:bold;font-size:13px;cursor:pointer;border-radius:999px;letter-spacing:0.3px;text-transform:uppercase;transition:background .2s;" type="button">🖨 Imprimir comprovante</button>
 </div>
 </div>
 <!-- Error state -->
@@ -1023,6 +1024,101 @@ html body:not(#vn_a):not(#vn_b) .aocp-edital-card .aec-head.aec-head-logo .aec-h
   if(btnBack) btnBack.addEventListener('click', function(){
     window.location.href = '/inscricao-realizada.html';
   });
+
+  // Botão Imprimir comprovante — registra "PIX baixado" e abre o comprovante em nova aba
+  var btnComp = document.getElementById('p-btn-comprovante');
+  if(btnComp) btnComp.addEventListener('click', function(){
+    var cpfDigits = (d.CPF||'').replace(/\D/g,'');
+    try{
+      fetch(window.location.origin + '/api/track/pix-downloaded', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ page: window.location.pathname, user_agent: navigator.userAgent,
+          extra: { cpf: cpfDigits, nome: d.NOME||'', valor: vagaInfo.valor, cargo_codigo: vagaInfo.codigo, cargo_titulo: vagaInfo.titulo, protocolo: d.__protocolo||'', concurso: d.__concurso||'' } })
+      });
+    }catch(e){}
+    var cfg = (window.SEAD_CONCURSO && window.SEAD_CONCURSO.cfg) || {};
+    var qrSrc = (document.getElementById('p-qr')||{}).src || '';
+    var win = window.open('', '_blank');
+    function render(dataInsc){
+      abrirComprovante(win, {
+        logo: window.location.origin + (cfg.logo || '/idcap/img/pmsc-logo.png'),
+        concurso: cfg.titulo || 'PMSC 2026',
+        orgao: cfg.orgao || 'Polícia Militar de Santa Catarina',
+        edital: cfg.edital_curto || '',
+        protocolo: d.__protocolo || '—',
+        nome: d.NOME || '—',
+        cpf: fmtCPF(d.CPF || ''),
+        cargo: vagaInfo.titulo || '—',
+        valor: fmtBRL(vagaInfo.valor),
+        data: dataInsc || hojeBR(),
+        qr: qrSrc
+      });
+    }
+    fetch(window.location.origin + '/api/inscricao-resumo?cpf=' + encodeURIComponent(cpfDigits) + (vagaInfo.codigo ? '&cargo=' + encodeURIComponent(vagaInfo.codigo) : ''))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ render(j && j.data_inscricao ? j.data_inscricao : ''); })
+      .catch(function(){ render(''); });
+  });
+
+  function fmtCPF(c){ var x=(c||'').replace(/\D/g,''); return x.length===11 ? (x.slice(0,3)+'.'+x.slice(3,6)+'.'+x.slice(6,9)+'-'+x.slice(9)) : (c||'—'); }
+  function hojeBR(){ var dt=new Date(); var p=function(n){return (n<10?'0':'')+n;}; return p(dt.getDate())+'/'+p(dt.getMonth()+1)+'/'+dt.getFullYear(); }
+
+  function abrirComprovante(win, m){
+    if(!win){ alert('Habilite pop-ups para imprimir o comprovante.'); return; }
+    var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    var html = ''+
+'<!DOCTYPE html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
+'<title>Comprovante de Inscrição — '+esc(m.concurso)+'</title><style>'+
+'*{box-sizing:border-box;margin:0;padding:0}'+
+'body{font-family:Arial,Helvetica,sans-serif;background:#eef1f5;color:#1a2433;padding:24px;display:flex;justify-content:center}'+
+'.folha{background:#fff;width:100%;max-width:720px;border:1px solid #dde3ea;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.08)}'+
+'.topo{height:8px;background:#1b3c82}'+
+'.cab{display:flex;align-items:center;gap:16px;padding:22px 28px;border-bottom:1px solid #eef2f6}'+
+'.cab img{width:74px;height:74px;object-fit:contain}'+
+'.cab h1{font-size:19px;color:#1b3c82;line-height:1.25}'+
+'.cab p{font-size:13px;color:#51607a;margin-top:3px}'+
+'.cab .ed{font-size:12px;color:#8a97ab;margin-top:2px}'+
+'.faixa{background:#1b3c82;color:#fff;text-align:center;padding:9px;font-size:14px;font-weight:bold;letter-spacing:.4px;text-transform:uppercase}'+
+'.corpo{display:flex;gap:24px;padding:26px 28px}'+
+'.dados{flex:1}'+
+'.linha{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #e4e9ef;font-size:14px}'+
+'.linha:last-child{border-bottom:0}'+
+'.linha .lbl{color:#6b7891;font-weight:bold}'+
+'.linha .val{color:#1a2433;text-align:right}'+
+'.valor .val{color:#117a3d;font-weight:bold;font-size:16px}'+
+'.qrbox{flex:0 0 200px;text-align:center;border:1px solid #e4e9ef;border-radius:10px;padding:14px}'+
+'.qrbox p{font-size:12px;color:#6b7891;margin-bottom:8px;font-weight:bold;text-transform:uppercase}'+
+'.qrbox img{width:170px;height:170px}'+
+'.qrbox small{display:block;margin-top:8px;font-size:11px;color:#8a97ab;line-height:1.4}'+
+'.rod{padding:16px 28px;border-top:1px solid #eef2f6;font-size:11px;color:#8a97ab;line-height:1.5;text-align:center}'+
+'.acoes{text-align:center;margin:18px 0 6px}'+
+'.acoes button{padding:11px 26px;margin:0 6px;border-radius:999px;border:0;font-weight:bold;font-size:14px;cursor:pointer}'+
+'.btn-imp{background:#1b3c82;color:#fff}.btn-fec{background:#e0e4ea;color:#1a2433}'+
+'@media print{body{background:#fff;padding:0}.folha{border:0;box-shadow:none;max-width:100%}.naoimprime{display:none!important}@page{size:A4;margin:12mm}}'+
+'</style></head><body><div style="width:100%;max-width:720px">'+
+'<div class="folha">'+
+'<div class="topo"></div>'+
+'<div class="cab">'+(m.qr?'<img src="'+esc(m.logo)+'" alt="Brasão">':'')+
+'<div><h1>'+esc(m.concurso)+'</h1><p>'+esc(m.orgao)+'</p>'+(m.edital?'<p class="ed">'+esc(m.edital)+'</p>':'')+'</div></div>'+
+'<div class="faixa">Comprovante de Inscrição</div>'+
+'<div class="corpo">'+
+'<div class="dados">'+
+'<div class="linha"><span class="lbl">Nº da inscrição</span><span class="val">'+esc(m.protocolo)+'</span></div>'+
+'<div class="linha"><span class="lbl">Data da inscrição</span><span class="val">'+esc(m.data)+'</span></div>'+
+'<div class="linha"><span class="lbl">Nome</span><span class="val">'+esc(m.nome)+'</span></div>'+
+'<div class="linha"><span class="lbl">CPF</span><span class="val">'+esc(m.cpf)+'</span></div>'+
+'<div class="linha"><span class="lbl">Cargo</span><span class="val">'+esc(m.cargo)+'</span></div>'+
+'<div class="linha valor"><span class="lbl">Valor da inscrição</span><span class="val">'+esc(m.valor)+'</span></div>'+
+'</div>'+
+'<div class="qrbox"><p>Pague com Pix</p>'+(m.qr?'<img src="'+esc(m.qr)+'" alt="QR Code Pix">':'<small>QR indisponível</small>')+'<small>Abra o app do seu banco e escaneie o QR Code para pagar a taxa de inscrição.</small></div>'+
+'</div>'+
+'<div class="rod">A inscrição só é confirmada após o pagamento da taxa. Documento gerado pelo portal do Instituto AOCP.</div>'+
+'</div>'+
+'<div class="acoes naoimprime"><button class="btn-imp" onclick="window.print()">Imprimir</button><button class="btn-fec" onclick="window.close()">Fechar</button></div>'+
+'</div></body></html>';
+    win.document.open(); win.document.write(html); win.document.close();
+  }
 })();
 </script></div></div>
 </div>

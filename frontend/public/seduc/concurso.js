@@ -10,7 +10,7 @@
       cargos: [
         {v: '201', t: 'Soldado do Quadro de Praças Policial Militar (QPPM)', p: '200.00'}
       ],
-      pagina: '/pmpe.html'
+      pagina: '/pmsc.html'
     }
   };
   var ALIAS = {assistente: 'pmpe'};
